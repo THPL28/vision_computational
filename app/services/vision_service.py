@@ -18,7 +18,7 @@ class VisionService:
             image = cv2.imread(image_path)
             height, width, _ = image.shape
             
-            # Atualize o caminho para os arquivos YOLOv3 aqui
+            # caminho para os arquivos YOLOv3 
             net = cv2.dnn.readNet("path_to_yolov3_weights/yolov3.weights", "path_to_yolov3_cfg/yolov3.cfg")
             
             layer_names = net.getLayerNames()

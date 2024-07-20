@@ -7,10 +7,10 @@ from app.routers import vision
 
 app = FastAPI()
 
-# Configurar diretório para arquivos estáticos (como HTML)
+# Configuração diretório para arquivos estáticos (como HTML)
 app.mount("/static", StaticFiles(directory="templates"), name="static")
 
-# Configurar templates Jinja2
+# Configuração templates Jinja2
 templates = Jinja2Templates(directory="templates")
 
 # Roteamento da API
