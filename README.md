@@ -1,87 +1,96 @@
+# 🚀 Vision AI Pro Enterprise v2.0
 
-# Vision Computational
+![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.95.0-059669?style=for-the-badge&logo=fastapi&logoColor=white)
+![OpenCV](https://img.shields.io/badge/OpenCV-4.7.0-5C3EE8?style=for-the-badge&logo=opencv&logoColor=white)
+![MediaPipe](https://img.shields.io/badge/MediaPipe-Google-00E676?style=for-the-badge&logo=google&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 
-![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.63.0-green)
-![OpenCV](https://img.shields.io/badge/OpenCV-4.5.2-orange)
+**Vision AI Pro Enterprise** é uma suíte de visão computacional de alto desempenho, projetada com os mesmos padrões de excelência da Google. Unindo **Deep Learning (YOLOv3)** e **Real-time Landmark Tracking (MediaPipe)**, esta plataforma oferece uma experiência de análise visual sem precedentes.
 
-## Descrição
+---
 
-O projeto Vision Computational é uma aplicação de visão computacional construída com FastAPI. Ele permite o upload de imagens e a detecção de objetos utilizando um modelo de rede neural treinado com YOLOv3. O objetivo é fornecer uma interface simples para realizar tarefas de detecção de objetos em imagens.
+## ✨ Funcionalidades "Google Level"
 
+### 📸 Image Insights
+- Detecção de objetos ultra-precisa baseada em YOLOv3 (COCO Dataset).
+- Renderização de anotações seguindo a paleta **Material Design 3**.
+- Chips de estatísticas inteligentes com confiança de detecção.
 
+### 🎥 Video Intelligence
+- Processamento assíncrono de frames de vídeo.
+- **Detecção de Movimento (MOG2)**: Ideal para monitoramento e segurança avançada.
+- Exportação inteligente com overlays técnicos.
 
-## Funcionalidades
-Upload de Imagens: Permite o upload de imagens para o servidor.
-Detecção de Objetos: Utiliza YOLOv3 para detectar objetos nas imagens enviadas.
+### 🖋️ Smart Whiteboard (Powered by MediaPipe)
+- **Landmark Hand Tracking**: Rastreio completo dos 21 pontos de referência da mão.
+- **Controle por Gestos**: Desenho imersivo usando o dedo indicador.
+- **Gesto "Pinch"**: Reset inteligente da lousa ao unir o polegar e o indicador.
+- **Zero Latência**: Engine otimizada para processamento direto no navegador via WASM.
 
-## Pré-requisitos
-Python 3.8 ou superior
-Pip (Python package installer)
+### 🎨 Material Design 3 Dashboard
+- Interface imersiva (Dark Theme).
+- Painel de telemetria: Latência de API, FPS estimado e contadores de objetos.
+- Design responsivo e interativo.
 
-## Instalação
-Clone o repositório:
+---
 
-git clone https://github.com/THPL28/vision_computational.git
-cd vision_computational
+## 🏗 Arquitetura do Sistema
 
-## Crie um ambiente virtual:
+```mermaid
+graph TD
+    A[Frontend: Material 3] -->|API REST| B[FastAPI Engine]
+    B --> C{Orchestrator}
+    C --> D[YOLOv3: Deep Learning]
+    C --> E[MediaPipe: Hand Engine]
+    C --> F[OpenCV: Motion Analysis]
+    D --> G[Static Result]
+    F --> H[Video Result]
+    E --> I[Real-time Canvas]
+```
 
-python -m venv venv
-Ative o ambiente virtual:
+---
 
-No Windows:
+## 🛠 Instalação Profissional
 
-.\venv\Scripts\activate
+### Via Docker (Recomendado)
+```bash
+# Build e Run imediato
+docker build -t vision-ai-pro .
+docker run -p 8000:8000 vision-ai-pro
+```
 
-No Linux/Mac:
+### Instalação Local
+1.  **Clone o Repositório:**
+    ```bash
+    git clone https://github.com/THPL28/vision_computational.git
+    cd vision_computational
+    ```
+2.  **Configuração de Ambiente:**
+    ```bash
+    python -m venv venv
+    ./venv/Scripts/activate  # Windows
+    pip install -r requirements.txt
+    ```
+3.  **Setup de Modelos:**
+    O sistema baixará automaticamente os pesos do YOLOv3 no primeiro boot via `prepare_project.py`.
 
-source venv/bin/activate
+4.  **Execução:**
+    ```bash
+    uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    ```
 
-Instale as dependências:
+---
 
-pip install -r requirements.txt
+## 🧪 API Documentation
+Acesse a telemetria e documentação OpenAPI em:
+- **Swagger**: `/api/v2/docs`
+- **Health Check**: `/health`
 
-## Baixe os arquivos de configuração e pesos do YOLOv3:
+---
 
-yolov3.cfg
-yolov3.weights
-Coloque esses arquivos na raiz do projeto.
+## 👨‍💻 Desenvolvedor
+**THPL28** - Vision AI Engineer.
 
-## Executando a Aplicação
-Inicie o servidor FastAPI:
-
-uvicorn app.main:app --reload
-Acesse a documentação interativa no navegador:
-
-Swagger UI: http://127.0.0.1:8000/docs
-Redoc: http://127.0.0.1:8000/redoc
-
-## Testando a API
-Via cURL
-Envie uma imagem para o endpoint /detect-objects/:
-
-curl -X POST "http://127.0.0.1:8000/detect-objects/" -F "file=@path_to_your_image.jpg"
-Via Python (requests)
-
-## Estrutura do Projeto
-
-```plaintext
-Vision_Computational/
-├── app/
-│   ├── __init__.py
-│   ├── main.py
-│   ├── routers/
-│   │   ├── __init__.py
-│   │   └── vision.py
-│   └── services/
-│       ├── __init__.py
-│       └── vision_service.py
-├── models/
-│   ├── __init__.py
-│   └── vision_model.py
-├── tests/
-│   ├── __init__.py
-│   └── test_vision.py
-├── requirements.txt
-└── README.md
+---
+*Este projeto é software livre sob a licença MIT.*
