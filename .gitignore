@@ -1,0 +1,25 @@
+# Professional .gitignore for Vision AI Pro
+
+# Compiled python files
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Large Model Weights (YOLO)
+yolov3.weights
+yolov3.cfg
+coco.names
+
+# Uploaded and Processed files
+static/uploads/*
+!static/uploads/.gitkeep
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/

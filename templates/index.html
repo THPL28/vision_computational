@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IA Vision Pro | Google Level Suite</title>
+    <!-- Modern Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto+Mono&display=swap"
+        rel="stylesheet">
+    <!-- MediaPipe Tasks Vision -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+
+    <style>
+        :root {
+            /* Material 3 Color Palette (Dark Theme) */
+            --m3-surface: #1C1B1F;
+            --m3-on-surface: #E6E1E5;
+            --m3-primary: #D0BCFF;
+            --m3-on-primary: #381E72;
+            --m3-secondary: #CCC2DC;
+            --m3-tertiary: #EFB8C8;
+            --m3-surface-variant: #49454F;
+            --m3-on-surface-variant: #CAC4D0;
+            --m3-outline: #938F99;
+            --bg-gradient: linear-gradient(135deg, #0F0F12 0%, #1A1A22 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Google Sans', sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--m3-on-surface);
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+        }
+
+        /* Side Navigation (Google Style) */
+        nav {
+            width: 80px;
+            background: rgba(28, 27, 31, 0.8);
+            border-right: 1px solid var(--m3-surface-variant);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 0;
+            gap: 2rem;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        .nav-item {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--m3-on-surface-variant);
+        }
+
+        .nav-item:hover {
+            background: var(--m3-surface-variant);
+            color: var(--m3-primary);
+        }
+
+        .nav-item.active {
+            background: var(--m3-primary);
+            color: var(--m3-on-primary);
+            box-shadow: 0 4px 12px rgba(208, 188, 255, 0.3);
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 2rem 3rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        header {
+            margin-bottom: 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .status-badge {
+            background: rgba(34, 197, 94, 0.1);
+            color: #4ade80;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        .card {
+            background: rgba(41, 40, 45, 0.6);
+            border-radius: 28px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .upload-zone {
+            border: 2px dashed var(--m3-outline);
+            border-radius: 24px;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .upload-zone:hover {
+            border-color: var(--m3-primary);
+            background: rgba(208, 188, 255, 0.05);
+        }
+
+        .btn-m3 {
+            background: var(--m3-primary);
+            color: var(--m3-on-primary);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 100px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+            width: fit-content;
+        }
+
+        .btn-m3:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+            box-shadow: 0 4px 20px rgba(208, 188, 255, 0.4);
+        }
+
+        /* Real-time Display */
+        .viewport {
+            position: relative;
+            border-radius: 24px;
+            overflow: hidden;
+            background: #000;
+            width: 100%;
+            aspect-ratio: 16/9;
+            border: 1px solid var(--m3-surface-variant);
+        }
+
+        canvas,
+        video,
+        img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        #cameraVideo {
+            transform: scaleX(-1);
+        }
+
+        /* Analytics Panel */
+        .analytics-card {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .stat-item {
+            padding: 1.25rem;
+            background: var(--m3-surface-variant);
+            border-radius: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--m3-on-surface-variant);
+            font-size: 0.9rem;
+        }
+
+        .stat-value {
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 700;
+            color: var(--m3-primary);
+            font-size: 1.1rem;
+        }
+
+        .detection-chip {
+            background: rgba(208, 188, 255, 0.1);
+            border: 1px solid rgba(208, 188, 255, 0.2);
+            color: var(--m3-primary);
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        /* Loader */
+        .m3-loader {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--m3-surface-variant);
+            border-top: 4px solid var(--m3-primary);
+            border-radius: 50%;
+            animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <div class="nav-item active" data-view="image" title="Análise de Imagem">📸</div>
+        <div class="nav-item" data-view="video" title="Análise de Vídeo">🎥</div>
+        <div class="nav-item" data-view="whiteboard" title="Lousa AI (MediaPipe)">🖋️</div>
+        <div class="nav-item" data-view="stats" title="Estatísticas">📊</div>
+    </nav>
+
+    <main>
+        <header>
+            <div>
+                <h1 id="viewTitle">Image Insights</h1>
+                <p style="color: var(--m3-on-surface-variant); font-size: 0.95rem;">Powered by High-Performance YOLOv3 &
+                    MediaPipe</p>
+            </div>
+            <div class="status-badge">
+                <span style="width: 8px; height: 8px; background: #4ade80; border-radius: 50%;"></span>
+                Server: Online
+            </div>
+        </header>
+
+        <div class="dashboard-grid">
+            <!-- Central Viewport -->
+            <section class="card">
+                <div id="dropZone" class="upload-zone">
+                    <div style="font-size: 4rem;">📁</div>
+                    <div style="text-align: center;">
+                        <h3 style="margin-bottom: 0.5rem;">Arraste arquivos ou clique aqui</h3>
+                        <p style="color: var(--m3-on-surface-variant);">SVG, JPG, PNG ou MP4</p>
+                    </div>
+                </div>
+
+                <div id="viewportContainer" class="viewport hidden">
+                    <img id="originalPreview" class="hidden">
+                    <img id="processedPreview" class="hidden">
+                    <video id="videoPreview" controls class="hidden"></video>
+                    <video id="cameraVideo" autoplay playsinline class="hidden"></video>
+                    <canvas id="outputCanvas"></canvas>
+                </div>
+
+                <div id="controls" class="hidden">
+                    <button class="btn-m3" id="processBtn">✨ Iniciar Processamento</button>
+                    <button class="btn-m3 hidden" id="clearBtn"
+                        style="background: var(--m3-surface-variant); color: var(--m3-on-surface);">Limpar</button>
+                    <button class="btn-m3 hidden" id="clearWhiteboard"
+                        style="background: var(--m3-tertiary); color: var(--m3-on-primary);">🗑️ Limpar Lousa</button>
+                </div>
+            </section>
+
+            <!-- Side Panel (Analytics) -->
+            <section class="analytics-card">
+                <div class="card">
+                    <h3 style="margin-bottom: 1.5rem;">Processamento em Tempo Real</h3>
+                    <div class="stat-item">
+                        <span class="stat-label">Model Engine</span>
+                        <span class="stat-value">Google Optimized</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">FPS Estimado</span>
+                        <span class="stat-value" id="fpsStat">0.0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Latência</span>
+                        <span class="stat-value" id="latencyStat">0ms</span>
+                    </div>
+                </div>
+
+                <div class="card" id="resultsPanel">
+                    <h3 style="margin-bottom: 1.5rem;">Detecções Inteligentes</h3>
+                    <div id="detectionsList" style="display: flex; flex-wrap: wrap; gap: 0.8rem;">
+                        <p style="color: var(--m3-on-surface-variant); italic;">Nenhum dado processado ainda.</p>
+                    </div>
+                </div>
+
+                <div class="card hidden" id="whiteboardControls">
+                    <h3 style="margin-bottom: 1rem;">Lousa MediaPipe</h3>
+                    <p style="font-size: 0.85rem; color: var(--m3-on-surface-variant); margin-bottom: 1.5rem;">
+                        Aponte seu **indicador** para desenhar. Una polegar e indicador para limpar.
+                    </p>
+                    <button class="btn-m3" id="toggleCamera">🎥 Iniciar Câmera</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <input type="file" id="fileInput" class="hidden">
+
+    <script>
+        // MediaPipe Hands Config
+        const hands = new Hands({
+            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+        });
+        hands.setOptions({
+            maxNumHands: 1,
+            modelComplexity: 1,
+            minDetectionConfidence: 0.5,
+            minTrackingConfidence: 0.5
+        });
+
+        const videoElement = document.getElementById('cameraVideo');
+        const canvasElement = document.getElementById('outputCanvas');
+        const canvasCtx = canvasElement.getContext('2d');
+        const processedPreview = document.getElementById('processedPreview');
+        const originalPreview = document.getElementById('originalPreview');
+        const videoPreview = document.getElementById('videoPreview');
+        const viewportContainer = document.getElementById('viewportContainer');
+        const dropZone = document.getElementById('dropZone');
+        const controls = document.getElementById('controls');
+        const processBtn = document.getElementById('processBtn');
+        const clearWhiteboard = document.getElementById('clearWhiteboard');
+
+        let activeView = 'image';
+        let selectedFile = null;
+        let whiteboardPoints = [];
+        let cameraRunning = false;
+
+        // Nav Logic
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.onclick = () => {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                activeView = item.dataset.view;
+                resetUI();
+            };
+        });
+
+        function resetUI() {
+            document.getElementById('viewTitle').textContent = {
+                image: 'Image Insights',
+                video: 'Video Intelligence',
+                whiteboard: 'Smart Whiteboard v2',
+                stats: 'Advanced Analytics'
+            }[activeView];
+
+            dropZone.classList.remove('hidden');
+            viewportContainer.classList.add('hidden');
+            controls.classList.add('hidden');
+            document.getElementById('whiteboardControls').classList.add('hidden');
+            clearWhiteboard.classList.add('hidden');
+            stopCamera();
+
+            if (activeView === 'whiteboard') {
+                dropZone.classList.add('hidden');
+                viewportContainer.classList.remove('hidden');
+                videoElement.classList.remove('hidden');
+                document.getElementById('whiteboardControls').classList.remove('hidden');
+                clearWhiteboard.classList.remove('hidden');
+            }
+        }
+
+        // File Logic
+        dropZone.onclick = () => document.getElementById('fileInput').click();
+        document.getElementById('fileInput').onchange = (e) => {
+            if (e.target.files.length > 0) {
+                selectedFile = e.target.files[0];
+                showPreview();
+            }
+        };
+
+        function showPreview() {
+            dropZone.classList.add('hidden');
+            viewportContainer.classList.remove('hidden');
+            controls.classList.remove('hidden');
+            processBtn.classList.remove('hidden');
+
+            originalPreview.classList.add('hidden');
+            processedPreview.classList.add('hidden');
+            videoPreview.classList.add('hidden');
+
+            if (selectedFile.type.startsWith('image/')) {
+                originalPreview.src = URL.createObjectURL(selectedFile);
+                originalPreview.classList.remove('hidden');
+            } else if (selectedFile.type.startsWith('video/')) {
+                videoPreview.src = URL.createObjectURL(selectedFile);
+                videoPreview.classList.remove('hidden');
+            }
+        }
+
+        // Upload Logic
+        processBtn.onclick = async () => {
+            if (!selectedFile) return;
+            processBtn.disabled = true;
+            processBtn.innerHTML = '<div class="m3-loader" style="width:20px;height:20px;border-width:2px;margin-right:10px"></div> Processando...';
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            const startTime = performance.now();
+            const endpoint = selectedFile.type.startsWith('image/') ? '/detect-objects/' : '/detect-video/';
+
+            try {
+                const response = await fetch(endpoint, { method: 'POST', body: formData });
+                const data = await response.json();
+
+                document.getElementById('latencyStat').textContent = Math.round(performance.now() - startTime) + 'ms';
+
+                if (data.success) {
+                    if (selectedFile.type.startsWith('image/')) {
+                        originalPreview.classList.add('hidden');
+                        processedPreview.src = data.annotated_url + '?t=' + Date.now();
+                        processedPreview.classList.remove('hidden');
+                        renderDetections(data.detections);
+                    } else {
+                        videoPreview.src = data.processed_url;
+                        videoPreview.load();
+                    }
+                }
+            } catch (err) { alert('Erro na conexão Vision AI'); }
+            finally {
+                processBtn.disabled = false;
+                processBtn.innerHTML = '✨ Iniciar Processamento';
+            }
+        };
+
+        function renderDetections(detections) {
+            const list = document.getElementById('detectionsList');
+            list.innerHTML = '';
+            detections.forEach(d => {
+                const chip = document.createElement('div');
+                chip.className = 'detection-chip';
+                chip.innerHTML = `<span>🎯</span> ${d.class} (${Math.round(d.confidence * 100)}%)`;
+                list.appendChild(chip);
+            });
+        }
+
+        // Whiteboard / MediaPipe
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720 } });
+                videoElement.srcObject = stream;
+                cameraRunning = true;
+                document.getElementById('toggleCamera').textContent = '⏹️ Parar Câmera';
+
+                const camera = new Camera(videoElement, {
+                    onFrame: async () => {
+                        if (cameraRunning) await hands.send({ image: videoElement });
+                    },
+                    width: 1280, height: 720
+                });
+                camera.start();
+            } catch (err) { alert('Câmera não permitida'); }
+        }
+
+        function stopCamera() {
+            cameraRunning = false;
+            if (videoElement.srcObject) {
+                videoElement.srcObject.getTracks().forEach(t => t.stop());
+                videoElement.srcObject = null;
+            }
+            document.getElementById('toggleCamera').textContent = '🎥 Iniciar Câmera';
+        }
+
+        document.getElementById('toggleCamera').onclick = () => cameraRunning ? stopCamera() : startCamera();
+        clearWhiteboard.onclick = () => whiteboardPoints = [];
+
+        hands.onResults((results) => {
+            if (!cameraRunning) return;
+            canvasCtx.save();
+            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+            if (canvasElement.width !== videoElement.videoWidth) {
+                canvasElement.width = videoElement.videoWidth;
+                canvasElement.height = videoElement.videoHeight;
+            }
+
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                const landmarks = results.multiHandLandmarks[0];
+                const indexTip = landmarks[8];
+                const thumbTip = landmarks[4];
+
+                const x = (1 - indexTip.x) * canvasElement.width;
+                const y = indexTip.y * canvasElement.height;
+
+                // Pinch detection (Reset whiteboard)
+                const pinchDist = Math.hypot(indexTip.x - thumbTip.x, indexTip.y - thumbTip.y);
+                if (pinchDist < 0.05) {
+                    whiteboardPoints = [];
+                } else {
+                    whiteboardPoints.push({ x, y });
+                }
+
+                // Draw landmarks for visual feedback
+                drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, { color: '#EFB8C8', lineWidth: 2 });
+                drawLandmarks(canvasCtx, landmarks, { color: '#D0BCFF', lineWidth: 1, radius: 2 });
+            }
+
+            // Draw Persistent Whiteboard Lines
+            if (whiteboardPoints.length > 1) {
+                canvasCtx.beginPath();
+                canvasCtx.strokeStyle = '#D0BCFF';
+                canvasCtx.lineWidth = 8;
+                canvasCtx.lineCap = 'round';
+                canvasCtx.moveTo(whiteboardPoints[0].x, whiteboardPoints[0].y);
+                for (let i = 1; i < whiteboardPoints.length; i++) {
+                    canvasCtx.lineTo(whiteboardPoints[i].x, whiteboardPoints[i].y);
+                }
+                canvasCtx.stroke();
+            }
+            canvasCtx.restore();
+        });
+    </script>
+</body>
+
+</html>
