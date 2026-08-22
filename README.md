@@ -3,14 +3,13 @@
 ![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.95.0-059669?style=for-the-badge&logo=fastapi&logoColor=white)
 ![OpenCV](https://img.shields.io/badge/OpenCV-4.7.0-5C3EE8?style=for-the-badge&logo=opencv&logoColor=white)
-![MediaPipe](https://img.shields.io/badge/MediaPipe-Google-00E676?style=for-the-badge&logo=google&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 
 **Vision AI Pro Enterprise** é uma suíte de visão computacional de alto desempenho, projetada com os mesmos padrões de excelência da Google. Unindo **Deep Learning (YOLOv3)** e **Real-time Landmark Tracking (MediaPipe)**, esta plataforma oferece uma experiência de análise visual sem precedentes.
 
 ---
 
-## ✨ Funcionalidades "Google Level"
+## ✨ Funcionalidades 
 
 ### 📸 Image Insights
 - Detecção de objetos ultra-precisa baseada em YOLOv3 (COCO Dataset).
